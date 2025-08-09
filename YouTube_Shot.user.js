@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        YouTube Shot
 // @namespace        http://tampermonkey.net/
-// @version        0.4
+// @version        0.5
 // @description        YouTube動画のスクリーンショットツール
 // @author        YouTube User
 // @match        https://www.youtube.com/*
@@ -42,9 +42,12 @@ function main(){
 
 
     function set_canvas(){
-        let cv='<canvas id="draw" style="position: absolute; z-index: -1; visibility: hidden;"></canvas>';
+        let cv=document.createElement("canvas");
+        cv.id='draw';
+        let cv_style='position: absolute; z-index: -1; visibility: hidden;';
+        cv.setAttribute('style', cv_style);
         if(!document.querySelector('#draw')){
-            document.body.insertAdjacentHTML('beforeend', cv); }
+            document.body.appendChild(cv); }
         let canvas=document.querySelector('#draw');
 
         setTimeout(()=>{
@@ -54,7 +57,7 @@ function main(){
                     event.preventDefault();
                     event.stopImmediatePropagation();
                     player_capture(canvas, 0); }
-                //「Ctrl+Sift+PrintScreen」キー入力
+                //「Shift+PrintScreen」キー入力
                 else if(event.keyCode==44 && event.shiftKey){
                     event.preventDefault();
                     event.stopImmediatePropagation();
@@ -103,4 +106,3 @@ function main(){
     } // player_capture()
 
 }// main()
-
