@@ -1,0 +1,51 @@
+// ==UserScript==
+// @name         YouTube Shot
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  YouTube動画のスクリーンショットツール
+// @author       You
+// @match        https://www.youtube.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
+// @grant        none
+// ==/UserScript==
+
+
+let retry=0;
+let interval=setInterval(wait_target, 20);
+function wait_target(){
+    retry++;
+    if(retry>100){ // リトライ制限 100回 2secまで
+        clearInterval(interval); }
+    let video=document.querySelector('video.html5-main-video');
+    if(video){
+        clearInterval(interval);
+        player_capture(video); }}
+
+
+function player_capture(video){
+    let cv='<canvas id="draw" style="position: absolute; z-index: -1;"></canvas>';
+    if(!document.querySelector('#draw')){
+        document.body.insertAdjacentHTML('beforeend', cv); }
+    let canvas=document.querySelector('#draw');
+
+
+    video.addEventListener('loadeddata', ()=>{
+        // スクリーンショットのサイズ 🔴
+        canvas.width=720;
+        canvas.height=720*video.videoHeight/video.videoWidth; });
+
+
+    document.addEventListener("keyup", check_key);
+
+    function check_key(event){
+        if(event.keyCode==44 && event.ctrlKey){ //「Ctrl+PrintScreen」キー入力
+
+            //videoをcanvas描写
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            let link=document.createElement("a");
+            link.href=canvas.toDataURL("image/png");
+            link.download="YT.png";
+            link.click();
+        }}
+}
